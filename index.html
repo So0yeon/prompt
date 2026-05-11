@@ -1279,43 +1279,43 @@ function endGame() {
   let msg;
   if (pct >= 0.9) {
   title = "👑 프롬프트 마스터";
-  msg = "${playerName}님은 완벽한 AI 탐정!! 프롬프트 마스터 인정✅ 이 실력이면 AI 회사 들어가도 되겠어요 🏆";
+  msg = '${playerName}님은 완벽한 AI 탐정!! 프롬프트 마스터 인정✅ 이 실력이면 AI 회사 들어가도 되겠어요 🏆';
 }
 else if (pct >= 0.8) {
   title = "🧠 AI 분석가";
-  msg = "${playerName}님! 와… 거의 다 맞혔어요! AI의 의도를 읽어내는 감각이 정말 뛰어나요 👀✨";
+  msg = '${playerName}님! 와… 거의 다 맞혔어요! AI의 의도를 읽어내는 감각이 정말 뛰어나요 👀✨';
 }
 else if (pct >= 0.7) {
   title = "🔥 데이터 탐정";
-  msg = "${playerName}님 대단해요!! AI의 눈으로 세상을 보는 능력, 엄청난 관찰력이에요 🔥";
+  msg = '${playerName}님 대단해요!! AI의 눈으로 세상을 보는 능력, 엄청난 관찰력이에요 🔥';
 }
 else if (pct >= 0.6) {
   title = "⚡ 프롬프트 헌터";
-  msg = "${playerName}님 좋아요! 프롬프트의 특징을 점점 잘 파악하고 있어요 😎";
+  msg = '${playerName}님 좋아요! 프롬프트의 특징을 점점 잘 파악하고 있어요 😎';
 }
 else if (pct >= 0.5) {
   title = "💪 AI 훈련생";
-  msg = "${playerName}님 절반 이상 맞혔어요! 연습하다보면 AI 프롬프트 고수가 될 거예요 💪";
+  msg = '${playerName}님 절반 이상 맞혔어요! 연습하다보면 AI 프롬프트 고수가 될 거예요 💪';
 }
 else if (pct >= 0.4) {
   title = "🌱 초보 탐험가";
-  msg = "${playerName}님! 감이 조금씩 오고 있어요 👏 한 문제씩 풀다 보면 실력이 쑥쑥 늘 거예요!";
+  msg = '${playerName}님! 감이 조금씩 오고 있어요 👏 한 문제씩 풀다 보면 실력이 쑥쑥 늘 거예요!';
 }
 else if (pct >= 0.3) {
   title = "🕵️ 수습 탐정";
-  msg = "${playerName}님 좋은 시작이에요! AI 탐정의 재능이 슬슬 보이기 시작했어요 🕵️";
+  msg = '${playerName}님 좋은 시작이에요! AI 탐정의 재능이 슬슬 보이기 시작했어요 🕵️';
 }
 else if (pct >= 0.2) {
   title = "🎈 호기심 연구원";
-  msg = "${playerName}님 괜찮아요! 프롬프트 세계는 원래 처음엔 헷갈릴 수 있어요 😊";
+  msg = '${playerName}님 괜찮아요! 프롬프트 세계는 원래 처음엔 헷갈릴 수 있어요 😊';
 }
 else if (pct >= 0.1) {
   title = "🐣 AI 입문자";
-  msg = "${playerName}님! 첫 도전만으로도 충분히 멋져요! 다시 하면 더 많이 맞힐 수 있을 거예요 🌱";
+  msg = '${playerName}님! 첫 도전만으로도 충분히 멋져요! 다시 하면 더 많이 맞힐 수 있을 거예요 🌱';
 }
 else {
   title = "🌟 용감한 도전자";
-  msg = "${playerName}님 도전해줘서 고마워요! 다시 도전하면 훨씬 잘할 수 있을 거예요 🌟";
+  msg = '${playerName}님 도전해줘서 고마워요! 다시 도전하면 훨씬 잘할 수 있을 거예요 🌟';
 }
   
   document.getElementById('end-msg').textContent = msg;
