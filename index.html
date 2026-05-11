@@ -969,6 +969,9 @@ function startGame() {
   playerName = document
     .getElementById("nameInput")
     .value.trim() || "플레이어";
+  
+  console.log(playerName);
+  
   currentStageIdx = 0;
   totalScore = 0;
   foundKeywords = new Set();
