@@ -716,7 +716,7 @@
   <div class="intro-card">
     <div class="rule-item"><span class="rule-icon">🖼️</span><span>화면의 AI 이미지를 꼼꼼하게 관찰하세요</span></div>
     <div class="rule-item"><span class="rule-icon">✍️</span><span>이미지를 만든 것 같은 <b>AI 프롬프트를 줄글로</b> 자유롭게 작성하세요!</span></div>
-    <div class="rule-item"><span class="rule-icon">🔍</span><span><b>채점하기</b>를 누르면 내 글 속에 정답 키워드가 몇 개 들어있는지 자동으로 분석해요</span></div>
+    <div class="rule-item"><span class="rule-icon">💯</span><span><b>채점하기</b>를 누르면 내 글 속에 정답 키워드가 몇 개 들어있는지 자동으로 분석해요</span></div>
     <div class="rule-item"><span class="rule-icon">🔄</span><span>키워드를 더 추가해서 다시 제출해도 OK! 모두 찾으면 다음 스테이지로!</span></div>
     <div class="rule-item"><span class="rule-icon">⭐</span><span>연습문제 1개 + 본게임 10개 스테이지 (총 300점 만점)</span></div>
   </div>
@@ -774,7 +774,10 @@
       autocomplete="off" autocorrect="off" spellcheck="false" rows="3"></textarea>
     <div class="input-row">
       <div class="char-count">맞힌 키워드: <span class="found-count" id="found-count">0</span> / <span id="total-count">0</span>개 &nbsp;|&nbsp; <span id="stage-score-label" style="color: var(--neon-pink)"></span></div>
-      <button class="btn-submit" id="btn-submit" onclick="submitPrompt()">🔍 채점하기</button>
+      <button class="btn-submit" id="btn-submit" onclick="submitPrompt()">🔍 중간점검</button>
+      <<button class="btn-submit" id="btn-final" onclick="finalSubmit()">
+  💯 채점하기
+</button>
     </div>
   </div>
 
@@ -1055,6 +1058,14 @@ function loadStage(idx) {
 
   // input focus
   const input = document.getElementById('keyword-input');
+
+  // 다시 입력 가능하게 풀기
+  input.disabled = false;
+
+  // 중간점검 버튼 다시 활성화
+  document.getElementById('btn-submit').disabled = false;  
+  document.getElementById('btn-final').disabled = false;
+
   input.value = '';
   input.focus();
 }
@@ -1174,7 +1185,7 @@ function showResultBanner(newlyFound, alreadyFound, missed, inputText) {
   }
 
   // Render highlighted answer prompt
-  renderAnswerPrompt();
+  // renderAnswerPrompt();
 }
 
 function renderAnswerPrompt() {
@@ -1429,6 +1440,25 @@ document.addEventListener('keydown', (e) => {
     submitPrompt();
   }
 });
+
+function finalSubmit() {
+
+  // 기존 중간점검 실행
+  submitPrompt();
+
+  // 모범답안 공개
+  renderAnswerPrompt();
+
+  // 입력 잠그기
+  document.getElementById('keyword-input').disabled = true;
+
+  // 중간점검 버튼 잠그기
+  document.getElementById('btn-submit').disabled = true;
+
+  document.getElementById('btn-final').disabled = true;
+  
+  showNpc('💯 최종 채점 완료!');
+}
 </script>
 </body>
 </html>
