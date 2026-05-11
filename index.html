@@ -692,6 +692,16 @@
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--neon-cyan)44; border-radius: 3px; }
+
+  #nameInput{
+    padding: 12px;
+    border-radius: 12px;
+    border: 2px solid #ddd;
+    width: 220px;
+    font-size: 16px;
+    margin: 16px 0;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -711,6 +721,13 @@
     <div class="rule-item"><span class="rule-icon">⭐</span><span>연습문제 1개 + 본게임 10개 스테이지 (총 300점 만점)</span></div>
   </div>
   
+  <input 
+    type="text"
+    id="nameInput"
+    placeholder="이름을 입력하세요"
+    maxlength="10"
+  >
+   
   <button class="btn-start" onclick="startGame()">🚀 게임 시작!</button>
 </div>
 
@@ -812,8 +829,6 @@
 <script>
 // ============================================================
 // GAME DATA
-// 게임 시작 전에 이름 입력받기
-const playerName = prompt("탐정님의 이을 입력해주세요!") || "플레이어";
 // ============================================================
   
 const gameData = [
@@ -943,11 +958,14 @@ let totalScore = 0;
 let foundKeywords = new Set();
 let npcTimer = null;
 let lastNpcType = null;
-
+let playerName = "플레이어";
 // ============================================================
 // INIT
 // ============================================================
 function startGame() {
+  playerName = document
+    .getElementById("nameInput")
+    .value.trim() || "플레이어";
   currentStageIdx = 0;
   totalScore = 0;
   foundKeywords = new Set();
