@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 AI 프롬프트 탐정단</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+  :root {
+    --bg: #0a0a1a;
+    --surface: #12122a;
+    --card: #1a1a3e;
+    --neon-cyan: #00f5ff;
+    --neon-pink: #ff00aa;
+    --neon-yellow: #ffee00;
+    --neon-green: #00ff88;
+    --neon-purple: #aa00ff;
+    --text: #e8e8ff;
+    --text-dim: #8888cc;
+    --glow-cyan: 0 0 10px #00f5ff, 0 0 30px #00f5ff44;
+    --glow-pink: 0 0 10px #ff00aa, 0 0 30px #ff00aa44;
+    --glow-green: 0 0 10px #00ff88, 0 0 30px #00ff8844;
+    --border-radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated starfield bg */
+  .stars {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    background: 
+      radial-gradient(1px 1px at 20% 30%, #ffffff44, transparent),
+      radial-gradient(1px 1px at 80% 10%, #ffffff33, transparent),
+      radial-gradient(1px 1px at 50% 80%, #ffffff55, transparent),
+      radial-gradient(1px 1px at 10% 60%, #ffffff22, transparent),
+      radial-gradient(1px 1px at 90% 70%, #ffffff44, transparent),
+      radial-gradient(1px 1px at 35% 15%, #ffffff33, transparent),
+      radial-gradient(1px 1px at 65% 50%, #ffffff44, transparent),
+      radial-gradient(2px 2px at 45% 40%, #00f5ff33, transparent),
+      radial-gradient(2px 2px at 75% 25%, #ff00aa22, transparent);
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle {
+    0% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; position: relative; z-index: 1; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+  /* ===== INTRO SCREEN ===== */
+  #intro-screen {
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .intro-robot {
+    font-size: 80px;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px #00f5ff);
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(-3deg); }
+    50% { transform: translateY(-15px) rotate(3deg); }
+  }
+
+  .intro-title {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(2rem, 6vw, 4rem);
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink), var(--neon-yellow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 16px 0 8px;
+    line-height: 1.2;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px #00f5ff88);
+  }
+
+  .intro-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    max-width: 500px;
+  }
+
+  .intro-card {
+    background: var(--card);
+    border: 1px solid var(--neon-cyan);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    max-width: 480px;
+    width: 100%;
+    margin-bottom: 32px;
+    box-shadow: var(--glow-cyan), inset 0 1px 0 #00f5ff22;
+    text-align: left;
+  }
+
+  .rule-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    margin-bottom: 14px; font-size: 0.95rem; line-height: 1.5;
+  }
+  .rule-icon { font-size: 1.3rem; flex-shrink: 0; }
+
+  .btn-start {
+    font-family: 'Jua', sans-serif;
+    font-size: 1.5rem;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    color: #000;
+    border: none; border-radius: 50px;
+    cursor: pointer;
+    box-shadow: var(--glow-cyan);
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .btn-start::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent, #ffffff33, transparent);
+    transform: translateX(-100%);
+    transition: transform 0.4s;
+  }
+  .btn-start:hover::after { transform: translateX(100%); }
+  .btn-start:hover { transform: scale(1.05); box-shadow: 0 0 20px #00f5ff, 0 0 60px #00f5ff66; }
+  .btn-start:active { transform: scale(0.98); }
+
+  /* ===== GAME SCREEN ===== */
+  #game-screen {
+    padding: 12px 16px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    gap: 0;
+  }
+
+  /* TOP BAR */
+  .top-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stage-badge {
+    font-family: 'Jua', sans-serif;
+    font-size: 0.9rem;
+    padding: 6px 16px;
+    background: var(--card);
+    border: 1px solid var(--neon-pink);
+    border-radius: 50px;
+    color: var(--neon-pink);
+    box-shadow: var(--glow-pink);
+    white-space: nowrap;
+  }
+
+  .score-display {
+    font-family: 'Jua', sans-serif;
+    font-size: 1.2rem;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 10px var(--neon-yellow);
+    white-space: nowrap;
+  }
+
+  .stage-title-text {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-align: right;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* PROGRESS BAR */
+  .progress-container {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .progress-track {
+    height: 12px;
+    background: var(--card);
+    border-radius: 8px;
+    border: 1px solid #ffffff22;
+    overflow: visible;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-yellow));
+    border-radius: 8px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-cyan)44;
+    position: relative;
+    width: 0%;
+  }
+
+  .progress-fill::after {
+    content: '⭐';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    filter: drop-shadow(0 0 6px gold);
+    transition: opacity 0.3s;
+  }
+
+  .progress-dots {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 0 2px;
+  }
+
+  .progress-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--text-dim);
+    transition: all 0.3s;
+    position: relative;
+  }
+  .progress-dot.done {
+    background: var(--neon-green);
+    border-color: var(--neon-green);
+    box-shadow: 0 0 6px var(--neon-green);
+  }
+  .progress-dot.current {
+    background: var(--neon-yellow);
+    border-color: var(--neon-yellow);
+    box-shadow: 0 0 8px var(--neon-yellow);
+    animation: pulse-dot 1s ease-in-out infinite;
+  }
+  @keyframes pulse-dot { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+  /* IMAGE AREA */
+  .image-wrapper {
+    width: 100%;
+    max-width: 860px;
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  .image-frame {
+    width: 100%;
+    aspect-ratio: 16/9;
+    max-height: 380px;
+    background: var(--card);
+    border: 2px solid var(--neon-cyan);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--glow-cyan), inset 0 0 40px #00000066;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .image-frame img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .image-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; color: var(--text-dim); font-size: 0.9rem;
+    position: absolute; inset: 0;
+  }
+  .image-placeholder .big-icon { font-size: 48px; }
+
+  /* KEYWORD CHIPS */
+  .keywords-area {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    min-height: 40px;
+    justify-content: center;
+  }
+
+  .keyword-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-family: 'Jua', sans-serif;
+    background: var(--surface);
+    border: 1px solid #ffffff22;
+    color: var(--text-dim);
+    transition: all 0.3s;
+  }
+  .keyword-chip.found {
+    background: linear-gradient(135deg, #00ff8822, #00f5ff22);
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+    box-shadow: 0 0 8px var(--neon-green)66;
+    animation: chip-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes chip-pop {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* INPUT AREA */
+  .input-area {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .keyword-input {
+    flex: 1;
+    font-family: 'Jua', sans-serif;
+    font-size: 1.3rem;
+    padding: 14px 22px;
+    background: var(--card);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 50px;
+    color: var(--text);
+    outline: none;
+    transition: all 0.3s;
+    box-shadow: inset 0 0 20px #00000044;
+  }
+  .keyword-input:focus {
+    border-color: var(--neon-pink);
+    box-shadow: var(--glow-pink), inset 0 0 20px #00000044;
+  }
+  .keyword-input.correct-flash {
+    animation: correct-flash 0.4s ease;
+  }
+  .keyword-input.wrong-flash {
+    animation: wrong-flash 0.3s ease;
+  }
+  @keyframes correct-flash {
+    0%,100% { background: var(--card); }
+    50% { background: #00ff8833; }
+  }
+  @keyframes wrong-flash {
+    0%,100% { transform: translateX(0); background: var(--card); }
+    25% { transform: translateX(-6px); background: #ff004433; }
+    75% { transform: translateX(6px); background: #ff004433; }
+  }
+
+  .btn-submit {
+    font-family: 'Jua', sans-serif;
+    font-size: 1rem;
+    padding: 14px 22px;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    color: #fff;
+    border: none; border-radius: 50px;
+    cursor: pointer;
+    box-shadow: var(--glow-pink);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-submit:hover { transform: scale(1.05); }
+  .btn-submit:active { transform: scale(0.97); }
+
+  /* HINT COUNTER */
+  .hint-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  .found-count { color: var(--neon-green); font-weight: 700; }
+  .total-count { color: var(--text-dim); }
+
+  /* ===== NPC BUBBLE ===== */
+  .npc-bubble {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    max-width: 280px;
+    background: var(--card);
+    border: 2px solid var(--neon-yellow);
+    border-radius: 16px 16px 4px 16px;
+    padding: 14px 18px;
+    z-index: 100;
+    box-shadow: 0 0 20px var(--neon-yellow)44;
+    animation: bubble-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: none;
+  }
+  .npc-bubble.show { display: block; }
+  @keyframes bubble-in {
+    0% { transform: scale(0.5) translateY(20px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .npc-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px;
+  }
+  .npc-avatar { font-size: 1.6rem; animation: float 2s ease-in-out infinite; }
+  .npc-name { font-family: 'Jua', sans-serif; color: var(--neon-yellow); font-size: 0.85rem; }
+  .npc-text { font-size: 0.88rem; line-height: 1.5; color: var(--text); }
+  .npc-close {
+    position: absolute; top: 8px; right: 10px;
+    cursor: pointer; color: var(--text-dim); font-size: 0.8rem;
+    background: none; border: none; color: var(--text-dim);
+  }
+
+  /* ===== END SCREEN ===== */
+  #end-screen {
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .end-robot { font-size: 80px; animation: victory-bounce 0.6s ease-in-out infinite alternate; }
+  @keyframes victory-bounce {
+    0% { transform: translateY(0) rotate(-5deg) scale(1); }
+    100% { transform: translateY(-20px) rotate(5deg) scale(1.1); }
+  }
+
+  .end-title {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    background: linear-gradient(135deg, var(--neon-yellow), var(--neon-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 16px 0;
+    filter: drop-shadow(0 0 20px #ffee0088);
+  }
+
+  .end-score-big {
+    font-family: 'Jua', sans-serif;
+    font-size: 5rem;
+    color: var(--neon-cyan);
+    text-shadow: var(--glow-cyan);
+    margin: 8px 0;
+    animation: score-pulse 1s ease-in-out infinite alternate;
+  }
+  @keyframes score-pulse {
+    0% { text-shadow: 0 0 10px var(--neon-cyan); }
+    100% { text-shadow: 0 0 30px var(--neon-cyan), 0 0 60px var(--neon-cyan); }
+  }
+
+  .end-msg { font-size: 1.1rem; color: var(--text-dim); margin-bottom: 32px; max-width: 400px; }
+
+  .btn-restart {
+    font-family: 'Jua', sans-serif;
+    font-size: 1.3rem;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+    color: #000;
+    border: none; border-radius: 50px;
+    cursor: pointer;
+    box-shadow: var(--glow-green);
+    transition: all 0.2s;
+  }
+  .btn-restart:hover { transform: scale(1.05); }
+
+  /* ===== PARTICLES ===== */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    border-radius: 50%;
+    animation: particle-fly var(--dur, 1s) ease-out forwards;
+  }
+  @keyframes particle-fly {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx, 0px), var(--ty, -80px)) scale(0); opacity: 0; }
+  }
+
+  .confetti-piece {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    width: 10px; height: 10px;
+    animation: confetti-fall var(--dur, 3s) ease-in forwards;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(var(--spin, 720deg)); opacity: 0; }
+  }
+
+  /* ===== CORRECT POPUP ===== */
+  .correct-popup {
+    position: fixed;
+    z-index: 500;
+    pointer-events: none;
+    font-family: 'Jua', sans-serif;
+    font-size: 1.4rem;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px var(--neon-green);
+    animation: popup-rise 0.8s ease-out forwards;
+  }
+  @keyframes popup-rise {
+    0% { transform: translateY(0) scale(0.8); opacity: 1; }
+    100% { transform: translateY(-60px) scale(1.1); opacity: 0; }
+  }
+
+  /* ===== STAGE TRANSITION ===== */
+  .stage-transition {
+    position: fixed; inset: 0;
+    background: radial-gradient(circle, #00f5ff11, #0a0a1a);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  .stage-transition.show { opacity: 1; pointer-events: all; }
+  .stage-transition h2 {
+    font-family: 'Jua', sans-serif;
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-yellow));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .stage-transition p { color: var(--text-dim); font-size: 1rem; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--neon-cyan)44; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<!-- ===== INTRO SCREEN ===== -->
+<div id="intro-screen" class="screen active">
+  <div class="intro-robot">🤖</div>
+  <h1 class="intro-title">AI 프롬프트<br>탐정단</h1>
+  <p class="intro-subtitle">이미지를 보고 AI에게 전달된 프롬프트 키워드를 맞혀보세요!</p>
+  
+  <div class="intro-card">
+    <div class="rule-item"><span class="rule-icon">🖼️</span><span>화면의 AI 이미지를 꼼꼼하게 관찰하세요</span></div>
+    <div class="rule-item"><span class="rule-icon">⌨️</span><span>이미지를 만든 <b>프롬프트 키워드</b>를 입력창에 타이핑 후 엔터!</span></div>
+    <div class="rule-item"><span class="rule-icon">⭐</span><span>연습문제 1개 + 본게임 10개 스테이지 (총 300점 만점)</span></div>
+    <div class="rule-item"><span class="rule-icon">🎉</span><span>모든 키워드를 맞히면 다음 스테이지로! 파이팅!</span></div>
+  </div>
+  
+  <button class="btn-start" onclick="startGame()">🚀 게임 시작!</button>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game-screen" class="screen">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="stage-badge" id="stage-badge">STAGE 0</div>
+    <div class="score-display">⭐ <span id="score-num">0</span>점</div>
+    <div class="stage-title-text" id="stage-title-text"></div>
+  </div>
+
+  <!-- Stage Progress Dots -->
+  <div class="progress-container">
+    <div class="progress-label">
+      <span>전체 진행도</span>
+      <span id="progress-label-right">0 / 11 스테이지</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-dots" id="progress-dots"></div>
+  </div>
+
+  <!-- Image -->
+  <div class="image-wrapper">
+    <div class="image-frame" id="image-frame">
+      <img id="game-image" src="" alt="스테이지 이미지" style="display:none;" onerror="this.style.display='none'; document.getElementById('img-placeholder').style.display='flex'">
+      <div class="image-placeholder" id="img-placeholder">
+        <div class="big-icon">🖼️</div>
+        <div>이미지를 로딩 중이에요...<br><small style="opacity:0.6;">images/stage0.png 경로를 확인하세요</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keywords -->
+  <div class="keywords-area" id="keywords-area"></div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <input type="text" class="keyword-input" id="keyword-input"
+      placeholder="키워드를 입력하고 엔터! 💡"
+      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <button class="btn-submit" onclick="submitKeyword()">입력 ✔</button>
+  </div>
+
+  <div class="hint-bar">
+    <span>맞힌 키워드: <span class="found-count" id="found-count">0</span></span>
+    <span class="total-count">/ <span id="total-count">0</span>개</span>
+    <span>|</span>
+    <span id="stage-score-label" style="color: var(--neon-pink)"></span>
+  </div>
+</div>
+
+<!-- ===== END SCREEN ===== -->
+<div id="end-screen" class="screen">
+  <div class="end-robot">🏆</div>
+  <h1 class="end-title">게임 완료!</h1>
+  <div class="end-score-big" id="final-score">0</div>
+  <div style="color: var(--text-dim); margin-bottom: 8px;">/ 300점 만점</div>
+  <p class="end-msg" id="end-msg"></p>
+  <button class="btn-restart" onclick="restartGame()">🔄 다시 도전!</button>
+</div>
+
+<!-- NPC Bubble -->
+<div class="npc-bubble" id="npc-bubble">
+  <button class="npc-close" onclick="closeNpc()">✕</button>
+  <div class="npc-header">
+    <span class="npc-avatar">🤖</span>
+    <span class="npc-name">탐정봇 ROB-E</span>
+  </div>
+  <div class="npc-text" id="npc-text"></div>
+</div>
+
+<!-- Stage Transition -->
+<div class="stage-transition" id="stage-transition">
+  <div style="font-size:60px" id="transition-emoji">🎊</div>
+  <h2 id="transition-title">스테이지 클리어!</h2>
+  <p id="transition-sub"></p>
+</div>
+
+<script>
+// ============================================================
+// GAME DATA
+// ============================================================
+const gameData = [
+  {
+    stage: 0,
+    title: "연습문제: 몸풀기 퀴즈",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage0.png",
+    keywords: ["날씨", "초원", "얼룩말", "장화", "스카프", "토끼", "당근", "구름", "해", "그림"]
+  },
+  {
+    stage: 1,
+    title: "스테이지 1: 고양이의 아슬아슬한 도망",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage1.png",
+    keywords: ["맑은", "하늘", "넓은", "운동장", "귀여운", "고양이", "빨간색", "망토", "두르고", "신나게", "달려가고", "입", "커다란", "생선", "물려있고", "뒤", "화난", "불독", "짧은", "다리", "열심히", "쫓아오는", "하얀", "구름", "떠있고", "노란색", "민들레", "피어있다", "크레파스", "만화"]
+  },
+  {
+    stage: 2,
+    title: "스테이지 2: 펭귄의 고독한 밤낚시",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage2.png",
+    keywords: ["어두운", "밤바다", "외로운", "작은", "배", "파도", "흔들리고", "위", "주황색", "구명조끼", "입은", "통통한", "펭귄", "초록색", "낚싯대", "꼭", "잡고", "앉아있다", "밤하늘", "둥근", "보름달", "밝게", "빛나고", "물속", "은색", "물고기", "헤엄치고", "귀엽고", "3D", "애니메이션"]
+  },
+  {
+    stage: 3,
+    title: "스테이지 3: 출근하는 기린 신사",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage3.png",
+    keywords: ["복잡하고", "시끄러운", "도시", "건널목", "키큰", "기린", "멋진", "선글라스", "쓰고", "당당하게", "걸어가고", "긴", "목", "파란색", "넥타이", "매여있고", "손", "뜨거운", "커피", "들고", "주변", "바쁘게", "움직이는", "사람들", "놀라서", "쳐다보고", "높은", "빌딩", "선명한", "사진"]
+  },
+  {
+    stage: 4,
+    title: "스테이지 4: 판다의 게으른 주말",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage4.png",
+    keywords: ["따뜻한", "햇살", "가득한", "거실", "푹신한", "소파", "게으른", "판다", "편안하게", "누워있다", "배", "빈", "과자", "봉지", "떨어져", "텔레비전", "시끄러운", "축구", "경기", "방송되고", "방", "구석", "로봇청소기", "윙윙거리며", "돌아다니고", "평화롭고", "재미있는", "풍경", "부드러운", "유화"]
+  },
+  {
+    stage: 5,
+    title: "스테이지 5: 우주를 나는 햄버거",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage5.png",
+    keywords: ["조용한", "우주공간", "커다란", "햄버거", "우주선", "별들", "빠르게", "날아가고", "창문", "초록색", "외계인", "활짝", "웃으며", "손", "흔들고", "뒤쪽", "뜨거운", "불꽃", "강력하게", "뿜어져", "아래", "푸른색", "지구", "아름답게", "빛나며", "돌아가고", "유쾌한", "픽셀", "아트", "스타일"]
+  },
+  {
+    stage: 6,
+    title: "스테이지 6: 하늘을 나는 종이비행기 버스",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage6.png",
+    keywords: ["노란색", "학교", "버스", "복잡한", "도시", "하늘", "자유롭게", "날아가고", "열린", "창문", "신난", "학생들", "종이비행기", "힘껏", "던지고", "운전석", "친절한", "곰", "핸들", "단단히", "잡고", "크게", "웃고", "붉은", "노을", "아름답게", "물드는", "따뜻한", "클레이", "아트"]
+  },
+  {
+    stage: 7,
+    title: "스테이지 7: 털복숭이 괴물의 생일파티",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage7.png",
+    keywords: ["어두운", "동굴", "초록색", "털복숭이", "괴물", "즐겁게", "생일", "파티", "열고", "둥근", "탁자", "달콤한", "딸기", "케이크", "놓여있고", "뾰족한", "고깔모자", "쓰고", "다섯", "촛불", "세게", "불어서", "끄고", "벽", "화려한", "풍선들", "가득하게", "매달려", "귀여운", "수채화"]
+  },
+  {
+    stage: 8,
+    title: "스테이지 8: 나무늘보의 아찔한 롤러코스터",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage8.png",
+    keywords: ["푸른", "숲속", "거대한", "놀이공원", "느린", "나무늘보", "빨간색", "롤러코스터", "타고", "빠르게", "내려가고", "두", "눈", "무서워서", "동그랗게", "커져있고", "바람", "긴", "털", "뒤로", "심하게", "날리고", "옆", "신난", "토끼", "양", "손", "위로", "번쩍", "들고"]
+  },
+  {
+    stage: 9,
+    title: "스테이지 9: 슬픈 티라노사우루스의 독서",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage9.png",
+    keywords: ["조용한", "도서관", "커다란", "공룡", "작은", "동화책", "읽으려고", "애쓰고", "짧은", "앞발", "책", "닿지", "않아서", "슬프게", "우는", "표정", "짓고", "주변", "두꺼운", "사전들", "산더미처럼", "높게", "쌓여있다", "창문", "노란색", "햇빛", "부드럽게", "들어오는", "실제", "사진"]
+  },
+  {
+    stage: 10,
+    title: "스테이지 10: 바다 청소부 잠수함",
+    image: "https://raw.githubusercontent.com/username/repo/main/images/stage10.png",
+    keywords: ["깊고", "차가운", "바닷속", "노란색", "잠수함", "기계", "팔", "뻗어서", "더러운", "쓰레기", "열심히", "줍고", "앞", "밝은", "조명", "환하게", "켜져있고", "근처", "호기심", "많은", "바다거북", "천천히", "다가와서", "구경하고", "신비로운", "파란색", "물방울들", "보글보글", "올라가는", "일러스트"]
+  }
+];
+
+// NPC messages
+const npcMessages = {
+  firstCorrect: [
+    "오오~! 맞췄다고? ㄹㅇ 천재각이잖아 🤩",
+    "와 이걸 맞혔어?? 눈이 카메라냐ㅋㅋ 👀",
+    "첫 키워드 득점! 이 기세 유지해봐 💪"
+  ],
+  correct: [
+    "ㅋㅋ 맞았음ㅋㅋ 역시 관찰력 갓벽 🔥",
+    "딩동댕~! 이 맛에 게임하지 ✨",
+    "오 인정 인정!! 짱짱맨이잖아 😎",
+    "ㄷㄷ 어떻게 그걸 봤어?? 인간AI 등장 🤖",
+    "그거 맞힌 거 실화냐?? 소름 돋음 ㄹㅇ 🥶",
+    "와 개잘하네 솔직히 내가 좀 놀람 🫡",
+    "맞췄을 때 기분 최고 아님?? 나만 그래?? 🎉",
+    "이렇게 또 하나 해결~! 멈출 수 없지 🏃",
+  ],
+  halfway: [
+    "절반 넘었다!! 이제 다 된 거 아님?? 🔥",
+    "와 이만큼이나 맞혔어?? 살짝 무서움ㅋㅋ 👻",
+    "반 이상 완료! 끝까지 달려~~ 🚀",
+  ],
+  almostDone: [
+    "ㄷㄷ 거의 다 됐잖아?? 마지막 스퍼트!! 💨",
+    "마지막 몇 개야!! 이거 못 찾으면 이상한 거임 🔍",
+    "와 곧 클리어각이다!! 집중 집중!! 👁️",
+  ],
+  stageClear: [
+    "ㅇㅈ? ㅇㅇㅈ!! 스테이지 클리어!! 미쳤다 진짜 🎊",
+    "와 이걸 다 맞혔어?? 탐정 자격증 줘야 함 🕵️",
+    "클리어!! 이 실력이면 AI도 울고 갈 듯 🤖💧",
+  ],
+  encouragement: [
+    "괜찮아~ 다 찾을 수 있어! 이미지 다시 한번 봐봐 👀",
+    "ㅋㅋ 어렵지?? 근데 분명 숨어있어!! 찾아봐~~ 🔎",
+    "포기하면 안 돼!! 탐정은 절대 포기 안 함!! 💪",
+  ]
+};
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let currentStageIdx = 0;
+let totalScore = 0;
+let foundKeywords = new Set();
+let npcTimer = null;
+let lastNpcType = null;
+
+// ============================================================
+// INIT
+// ============================================================
+function startGame() {
+  currentStageIdx = 0;
+  totalScore = 0;
+  foundKeywords = new Set();
+  showScreen('game-screen');
+  buildProgressDots();
+  loadStage(currentStageIdx);
+  setTimeout(() => showNpc(getNpcMsg('firstCorrect').replace('맞췄다고?','시작했어요?').replace('맞췄어??','시작했어??'), true), 1200);
+}
+
+function restartGame() {
+  showScreen('intro-screen');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ============================================================
+// PROGRESS DOTS
+// ============================================================
+function buildProgressDots() {
+  const container = document.getElementById('progress-dots');
+  container.innerHTML = '';
+  gameData.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    dot.id = `dot-${i}`;
+    dot.title = gameData[i].title;
+    container.appendChild(dot);
+  });
+}
+
+function updateProgress() {
+  const pct = (currentStageIdx / (gameData.length)) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label-right').textContent = `${currentStageIdx} / ${gameData.length} 스테이지`;
+  
+  gameData.forEach((_, i) => {
+    const dot = document.getElementById(`dot-${i}`);
+    if (!dot) return;
+    dot.className = 'progress-dot';
+    if (i < currentStageIdx) dot.classList.add('done');
+    else if (i === currentStageIdx) dot.classList.add('current');
+  });
+}
+
+// ============================================================
+// LOAD STAGE
+// ============================================================
+function loadStage(idx) {
+  const stage = gameData[idx];
+  foundKeywords = new Set();
+
+  // badges & labels
+  document.getElementById('stage-badge').textContent = idx === 0 ? '연습문제' : `STAGE ${idx}`;
+  document.getElementById('stage-title-text').textContent = stage.title;
+  document.getElementById('score-num').textContent = totalScore;
+  document.getElementById('stage-score-label').textContent = idx === 0 ? '연습문제 (점수 없음)' : `이번 스테이지 +${stage.keywords.length}점 가능`;
+
+  // image
+  const img = document.getElementById('game-image');
+  const placeholder = document.getElementById('img-placeholder');
+  img.style.display = 'none';
+  placeholder.style.display = 'flex';
+  img.src = '';
+  setTimeout(() => {
+    img.onload = () => { img.style.display = 'block'; placeholder.style.display = 'none'; };
+    img.onerror = () => { img.style.display = 'none'; placeholder.style.display = 'flex'; };
+    img.src = stage.image;
+  }, 50);
+
+  // keywords chips
+  buildKeywordChips(stage.keywords);
+
+  // counts
+  updateCounts();
+  updateProgress();
+
+  // input focus
+  const input = document.getElementById('keyword-input');
+  input.value = '';
+  input.focus();
+}
+
+function buildKeywordChips(keywords) {
+  const area = document.getElementById('keywords-area');
+  area.innerHTML = '';
+  keywords.forEach(kw => {
+    const chip = document.createElement('div');
+    chip.className = 'keyword-chip';
+    chip.id = `chip-${kw}`;
+    chip.textContent = '?????';
+    area.appendChild(chip);
+  });
+}
+
+function updateCounts() {
+  const stage = gameData[currentStageIdx];
+  document.getElementById('found-count').textContent = foundKeywords.size;
+  document.getElementById('total-count').textContent = stage.keywords.length;
+}
+
+// ============================================================
+// SUBMIT KEYWORD
+// ============================================================
+function submitKeyword() {
+  const input = document.getElementById('keyword-input');
+  const val = input.value.trim();
+  if (!val) return;
+
+  const stage = gameData[currentStageIdx];
+  const match = stage.keywords.find(kw => kw === val && !foundKeywords.has(kw));
+
+  if (match) {
+    handleCorrect(match, input);
+  } else {
+    handleWrong(input, stage.keywords.includes(val));
+  }
+}
+
+function handleCorrect(keyword, input) {
+  foundKeywords.add(keyword);
+  input.value = '';
+  input.classList.add('correct-flash');
+  setTimeout(() => input.classList.remove('correct-flash'), 400);
+
+  // reveal chip
+  const chip = document.getElementById(`chip-${keyword}`);
+  if (chip) {
+    chip.textContent = keyword;
+    chip.classList.add('found');
+  }
+
+  // particles at input
+  spawnParticles(input);
+  // popup text
+  showCorrectPopup(keyword, input);
+
+  // score (not for stage 0)
+  if (currentStageIdx > 0) {
+    totalScore++;
+    document.getElementById('score-num').textContent = totalScore;
+  }
+
+  updateCounts();
+
+  // NPC messages
+  const pct = foundKeywords.size / gameData[currentStageIdx].keywords.length;
+  if (foundKeywords.size === 1) {
+    showNpc(getNpcMsg('firstCorrect'));
+  } else if (Math.abs(pct - 0.5) < 0.05 && foundKeywords.size > 1) {
+    showNpc(getNpcMsg('halfway'));
+  } else if (pct >= 0.85 && pct < 1) {
+    showNpc(getNpcMsg('almostDone'));
+  } else if (foundKeywords.size % 5 === 0 && foundKeywords.size > 0 && pct < 1) {
+    showNpc(getNpcMsg('correct'));
+  }
+
+  // check stage clear
+  if (foundKeywords.size === gameData[currentStageIdx].keywords.length) {
+    setTimeout(stageClear, 600);
+  }
+}
+
+function handleWrong(input, alreadyFound) {
+  input.classList.add('wrong-flash');
+  setTimeout(() => input.classList.remove('wrong-flash'), 300);
+  input.select();
+
+  // occasional encouragement
+  if (Math.random() < 0.25) {
+    showNpc(getNpcMsg('encouragement'));
+  }
+}
+
+// ============================================================
+// STAGE CLEAR
+// ============================================================
+function stageClear() {
+  launchConfetti();
+  showNpc(getNpcMsg('stageClear'));
+
+  const isLast = currentStageIdx === gameData.length - 1;
+  const transition = document.getElementById('stage-transition');
+  
+  document.getElementById('transition-emoji').textContent = isLast ? '🏆' : '🎊';
+  document.getElementById('transition-title').textContent = isLast ? '전체 클리어!!' : `스테이지 ${currentStageIdx === 0 ? '연습' : currentStageIdx} 클리어!`;
+  document.getElementById('transition-sub').textContent = isLast 
+    ? `최종 점수: ${totalScore}점! 대단해요!!` 
+    : `다음 스테이지로 이동합니다... 준비되셨나요?`;
+  
+  transition.classList.add('show');
+
+  setTimeout(() => {
+    transition.classList.remove('show');
+    if (isLast) {
+      endGame();
+    } else {
+      currentStageIdx++;
+      loadStage(currentStageIdx);
+    }
+  }, 2200);
+}
+
+// ============================================================
+// END GAME
+// ============================================================
+function endGame() {
+  showScreen('end-screen');
+  document.getElementById('final-score').textContent = totalScore;
+  
+  const pct = totalScore / 300;
+  let msg;
+  if (pct >= 0.9) msg = "완벽한 AI 탐정!! 프롬프트 마스터 인정✅ 이 실력이면 AI 회사 들어갈 수도 있음ㅋㅋ 🏆";
+  else if (pct >= 0.7) msg = "대단해요!! AI의 눈으로 세상을 보는 능력, 엄청난 관찰력이에요 🔥";
+  else if (pct >= 0.5) msg = "절반 이상 맞혔어요! 연습하다보면 AI 프롬프트 고수가 될 거예요 💪";
+  else msg = "도전해줘서 고마워요! 다시 도전하면 훨씬 잘할 수 있을 거예요 🌟";
+  
+  document.getElementById('end-msg').textContent = msg;
+  launchConfetti();
+}
+
+// ============================================================
+// NPC
+// ============================================================
+function getNpcMsg(type) {
+  const msgs = npcMessages[type] || npcMessages.correct;
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+let npcTimeout = null;
+function showNpc(text, instant = false) {
+  if (npcTimeout) clearTimeout(npcTimeout);
+  const bubble = document.getElementById('npc-bubble');
+  document.getElementById('npc-text').textContent = text;
+  bubble.classList.add('show');
+  npcTimeout = setTimeout(() => bubble.classList.remove('show'), 4000);
+}
+
+function closeNpc() {
+  document.getElementById('npc-bubble').classList.remove('show');
+  if (npcTimeout) clearTimeout(npcTimeout);
+}
+
+// ============================================================
+// PARTICLES
+// ============================================================
+function spawnParticles(anchorEl) {
+  const rect = anchorEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top;
+  const colors = ['#00ff88', '#00f5ff', '#ffee00', '#ff00aa', '#aa00ff'];
+  
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 5 + Math.random() * 7;
+    const angle = (Math.random() * 2 * Math.PI);
+    const dist = 40 + Math.random() * 60;
+    const tx = Math.cos(angle) * dist;
+    const ty = -(30 + Math.random() * 80);
+    const dur = 0.5 + Math.random() * 0.5;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      left:${cx + (Math.random()-0.5)*30}px; top:${cy}px;
+      --tx:${tx}px; --ty:${ty}px; --dur:${dur}s;
+      box-shadow: 0 0 6px currentColor;
+    `;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), dur * 1000 + 100);
+  }
+}
+
+function showCorrectPopup(keyword, anchorEl) {
+  const rect = anchorEl.getBoundingClientRect();
+  const popup = document.createElement('div');
+  popup.className = 'correct-popup';
+  popup.textContent = `✅ ${keyword}`;
+  popup.style.cssText = `
+    left: ${rect.left + rect.width/2 - 60}px;
+    top: ${rect.top - 10}px;
+  `;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 900);
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function launchConfetti() {
+  const colors = ['#00f5ff', '#ff00aa', '#ffee00', '#00ff88', '#aa00ff', '#ff6600', '#ffffff'];
+  const shapes = ['border-radius:50%', 'border-radius:2px', 'transform:rotate(45deg)', 'border-radius:0'];
+  
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      const size = 6 + Math.random() * 10;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      const dur = 2 + Math.random() * 2;
+      const spin = 360 + Math.random() * 720;
+      p.style.cssText = `
+        width:${size}px; height:${size}px;
+        background:${color};
+        left:${Math.random() * 100}vw;
+        top: -20px;
+        ${shape};
+        --dur:${dur}s; --spin:${spin}deg;
+        opacity: ${0.7 + Math.random() * 0.3};
+      `;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), dur * 1000 + 200);
+    }, i * 30);
+  }
+}
+
+// ============================================================
+// KEYBOARD SUPPORT
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen && activeScreen.id === 'game-screen') {
+      submitKeyword();
+    }
+  }
+});
+
+// Auto-focus input when clicking anywhere on game screen
+document.getElementById('game-screen').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+    document.getElementById('keyword-input').focus();
+  }
+});
+</script>
+</body>
+</html>
