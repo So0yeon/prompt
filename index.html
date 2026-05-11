@@ -331,20 +331,33 @@
   .input-area {
     width: 100%;
     display: flex;
-    gap: 12px;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
   }
 
+  .input-label {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .input-label span { color: var(--neon-cyan); font-weight: 700; }
+
   .keyword-input {
-    flex: 1;
-    font-family: 'Jua', sans-serif;
-    font-size: 1.3rem;
-    padding: 14px 22px;
+    width: 100%;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    padding: 16px 20px;
     background: var(--card);
     border: 2px solid var(--neon-cyan);
-    border-radius: 50px;
+    border-radius: 16px;
     color: var(--text);
     outline: none;
+    resize: vertical;
+    min-height: 90px;
+    max-height: 180px;
     transition: all 0.3s;
     box-shadow: inset 0 0 20px #00000044;
   }
@@ -352,26 +365,37 @@
     border-color: var(--neon-pink);
     box-shadow: var(--glow-pink), inset 0 0 20px #00000044;
   }
-  .keyword-input.correct-flash {
-    animation: correct-flash 0.4s ease;
+  .keyword-input.grading-flash {
+    animation: grading-flash 0.5s ease;
   }
   .keyword-input.wrong-flash {
     animation: wrong-flash 0.3s ease;
   }
-  @keyframes correct-flash {
+  @keyframes grading-flash {
     0%,100% { background: var(--card); }
-    50% { background: #00ff8833; }
+    40% { background: #00f5ff11; border-color: var(--neon-cyan); }
   }
   @keyframes wrong-flash {
-    0%,100% { transform: translateX(0); background: var(--card); }
-    25% { transform: translateX(-6px); background: #ff004433; }
-    75% { transform: translateX(6px); background: #ff004433; }
+    0%,100% { background: var(--card); }
+    50% { background: #ff004422; border-color: #ff4444; }
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .char-count {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    flex: 1;
   }
 
   .btn-submit {
     font-family: 'Jua', sans-serif;
-    font-size: 1rem;
-    padding: 14px 22px;
+    font-size: 1.1rem;
+    padding: 13px 28px;
     background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
     color: #fff;
     border: none; border-radius: 50px;
@@ -379,9 +403,131 @@
     box-shadow: var(--glow-pink);
     transition: all 0.2s;
     white-space: nowrap;
+    position: relative; overflow: hidden;
   }
+  .btn-submit::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent, #ffffff22, transparent);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  .btn-submit:hover::after { transform: translateX(100%); }
   .btn-submit:hover { transform: scale(1.05); }
   .btn-submit:active { transform: scale(0.97); }
+  .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* RESULT BANNER */
+  .result-banner {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--neon-green);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: var(--glow-green);
+    animation: banner-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .result-banner.show { display: flex; }
+  @keyframes banner-in {
+    0% { transform: scaleY(0.8); opacity: 0; }
+    100% { transform: scaleY(1); opacity: 1; }
+  }
+  .result-banner-title {
+    font-family: 'Jua', sans-serif;
+    font-size: 0.95rem;
+    color: var(--neon-green);
+  }
+  .result-found-list {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .result-tag {
+    font-size: 0.82rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: #00ff8822;
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+  }
+  .result-miss {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  /* ANSWER PROMPT SECTION */
+  .answer-prompt-section {
+    border-top: 1px solid #ffffff11;
+    margin-top: 10px;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .answer-prompt-label {
+    font-size: 0.75rem;
+    color: var(--neon-yellow);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .answer-prompt-text {
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: var(--text);
+    background: #ffffff08;
+    border-radius: 10px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--neon-yellow);
+    word-break: keep-all;
+  }
+
+  .answer-prompt-text .kw-hit {
+    background: linear-gradient(135deg, #00ff8844, #00f5ff22);
+    color: var(--neon-green);
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-weight: 700;
+  }
+  .answer-prompt-text .kw-miss {
+    background: #ff00aa18;
+    color: #ff88cc;
+    border-radius: 4px;
+    padding: 1px 4px;
+  }
+
+  /* NEXT STAGE BUTTON */
+  .next-stage-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+
+  .btn-next-stage {
+    font-family: 'Jua', sans-serif;
+    font-size: 1rem;
+    padding: 11px 26px;
+    background: linear-gradient(135deg, var(--neon-yellow), #ff9900);
+    color: #000;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 12px var(--neon-yellow)66;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .btn-next-stage::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent, #ffffff33, transparent);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  .btn-next-stage:hover::after { transform: translateX(100%); }
+  .btn-next-stage:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--neon-yellow)88; }
+  .btn-next-stage:active { transform: scale(0.97); }
 
   /* HINT COUNTER */
   .hint-bar {
@@ -559,9 +705,10 @@
   
   <div class="intro-card">
     <div class="rule-item"><span class="rule-icon">🖼️</span><span>화면의 AI 이미지를 꼼꼼하게 관찰하세요</span></div>
-    <div class="rule-item"><span class="rule-icon">⌨️</span><span>이미지를 만든 <b>프롬프트 키워드</b>를 입력창에 타이핑 후 엔터!</span></div>
+    <div class="rule-item"><span class="rule-icon">✍️</span><span>이미지를 만든 것 같은 <b>AI 프롬프트를 줄글로</b> 자유롭게 작성하세요!</span></div>
+    <div class="rule-item"><span class="rule-icon">🔍</span><span><b>채점하기</b>를 누르면 내 글 속에 정답 키워드가 몇 개 들어있는지 자동으로 분석해요</span></div>
+    <div class="rule-item"><span class="rule-icon">🔄</span><span>키워드를 더 추가해서 다시 제출해도 OK! 모두 찾으면 다음 스테이지로!</span></div>
     <div class="rule-item"><span class="rule-icon">⭐</span><span>연습문제 1개 + 본게임 10개 스테이지 (총 300점 만점)</span></div>
-    <div class="rule-item"><span class="rule-icon">🎉</span><span>모든 키워드를 맞히면 다음 스테이지로! 파이팅!</span></div>
   </div>
   
   <button class="btn-start" onclick="startGame()">🚀 게임 시작!</button>
@@ -604,17 +751,34 @@
 
   <!-- Input -->
   <div class="input-area">
-    <input type="text" class="keyword-input" id="keyword-input"
-      placeholder="키워드를 입력하고 엔터! 💡"
-      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-    <button class="btn-submit" onclick="submitKeyword()">입력 ✔</button>
+    <div class="input-label">✏️ 이미지를 보고 <span>AI 프롬프트를 줄글로 자유롭게</span> 써보세요! (Ctrl+Enter로 제출)</div>
+    <textarea class="keyword-input" id="keyword-input"
+      placeholder="예시: 맑은 하늘 아래 넓은 운동장에서 귀여운 고양이가 빨간색 망토를 두르고..."
+      autocomplete="off" autocorrect="off" spellcheck="false" rows="3"></textarea>
+    <div class="input-row">
+      <div class="char-count">맞힌 키워드: <span class="found-count" id="found-count">0</span> / <span id="total-count">0</span>개 &nbsp;|&nbsp; <span id="stage-score-label" style="color: var(--neon-pink)"></span></div>
+      <button class="btn-submit" id="btn-submit" onclick="submitPrompt()">🔍 채점하기</button>
+    </div>
   </div>
 
-  <div class="hint-bar">
-    <span>맞힌 키워드: <span class="found-count" id="found-count">0</span></span>
-    <span class="total-count">/ <span id="total-count">0</span>개</span>
-    <span>|</span>
-    <span id="stage-score-label" style="color: var(--neon-pink)"></span>
+  <!-- Result Banner -->
+  <div class="result-banner" id="result-banner">
+    <div class="result-banner-title" id="result-banner-title"></div>
+    <div class="result-found-list" id="result-found-list"></div>
+    <div class="result-miss" id="result-miss"></div>
+
+    <!-- Answer Prompt (always visible after first submit) -->
+    <div class="answer-prompt-section">
+      <div class="answer-prompt-label">✨ 원본 AI 프롬프트</div>
+      <div class="answer-prompt-text" id="answer-prompt-text"></div>
+    </div>
+
+    <!-- Next Stage Button -->
+    <div class="next-stage-row">
+      <button class="btn-next-stage" id="btn-next-stage" onclick="goNextStage()">
+        다음 문제로 ➜
+      </button>
+    </div>
   </div>
 </div>
 
@@ -654,66 +818,77 @@ const gameData = [
     stage: 0,
     title: "연습문제: 몸풀기 퀴즈",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage0.png",
+    prompt: "화창한 날씨의 푸른 초원 위에 서 있는 귀여운 얼룩말 한 마리. 얼룩말은 노란색 장화를 신고 있고, 목에는 알록달록한 스카프를 매고 있다. 옆에는 작은 토끼 친구가 당근을 먹고 있으며, 하늘에는 하얀 구름과 둥근 해가 떠 있다. 부드러운 색연필로 그린 동화책 그림 스타일.",
     keywords: ["날씨", "초원", "얼룩말", "장화", "스카프", "토끼", "당근", "구름", "해", "그림"]
   },
   {
     stage: 1,
     title: "스테이지 1: 고양이의 아슬아슬한 도망",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage1.png",
+    prompt: "맑은 하늘 아래 넓은 운동장에서 귀여운 고양이가 빨간색 망토를 두르고 신나게 달려가고 있다. 고양이의 입에는 커다란 생선이 물려있고, 뒤에서는 화난 불독이 짧은 다리로 열심히 쫓아오는 중이다. 하늘에는 하얀 구름이 떠있고, 운동장에는 노란색 민들레가 피어있다. 전체적으로 크레파스로 그린 만화 스타일이다.",
     keywords: ["맑은", "하늘", "넓은", "운동장", "귀여운", "고양이", "빨간색", "망토", "두르고", "신나게", "달려가고", "입", "커다란", "생선", "물려있고", "뒤", "화난", "불독", "짧은", "다리", "열심히", "쫓아오는", "하얀", "구름", "떠있고", "노란색", "민들레", "피어있다", "크레파스", "만화"]
   },
   {
     stage: 2,
     title: "스테이지 2: 펭귄의 고독한 밤낚시",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage2.png",
+    prompt: "어두운 밤바다 한가운데 외로운 작은 배가 파도에 흔들리고 있다. 배 위에는 주황색 구명조끼를 입은 통통한 펭귄이 초록색 낚싯대를 꼭 잡고 앉아있다. 밤하늘에는 둥근 보름달이 밝게 빛나고, 물속에서는 은색 물고기들이 헤엄치고 있다. 전체적으로 귀엽고 3D 애니메이션 느낌을 보여준다.",
     keywords: ["어두운", "밤바다", "외로운", "작은", "배", "파도", "흔들리고", "위", "주황색", "구명조끼", "입은", "통통한", "펭귄", "초록색", "낚싯대", "꼭", "잡고", "앉아있다", "밤하늘", "둥근", "보름달", "밝게", "빛나고", "물속", "은색", "물고기", "헤엄치고", "귀엽고", "3D", "애니메이션"]
   },
   {
     stage: 3,
     title: "스테이지 3: 출근하는 기린 신사",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage3.png",
+    prompt: "복잡하고 시끄러운 도시의 건널목에서 키큰 기린이 멋진 선글라스를 쓰고 당당하게 걸어가고 있다. 기린의 긴 목에는 파란색 넥타이가 매여있고, 손에는 뜨거운 커피를 들고 있다. 주변에는 바쁘게 움직이는 사람들이 놀라서 쳐다보고 있으며, 높은 빌딩들이 세워진 선명한 사진 스타일이다.",
     keywords: ["복잡하고", "시끄러운", "도시", "건널목", "키큰", "기린", "멋진", "선글라스", "쓰고", "당당하게", "걸어가고", "긴", "목", "파란색", "넥타이", "매여있고", "손", "뜨거운", "커피", "들고", "주변", "바쁘게", "움직이는", "사람들", "놀라서", "쳐다보고", "높은", "빌딩", "선명한", "사진"]
   },
   {
     stage: 4,
     title: "스테이지 4: 판다의 게으른 주말",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage4.png",
+    prompt: "따뜻한 햇살이 가득한 거실에서 푹신한 소파에 게으른 판다가 편안하게 누워있다. 판다의 배 위에는 빈 과자 봉지가 떨어져 있고, 텔레비전에서는 시끄러운 축구 경기가 방송되고 있다. 방 구석에는 로봇청소기가 윙윙거리며 돌아다니고 있는 평화롭고 재미있는 풍경을 그린 부드러운 유화다.",
     keywords: ["따뜻한", "햇살", "가득한", "거실", "푹신한", "소파", "게으른", "판다", "편안하게", "누워있다", "배", "빈", "과자", "봉지", "떨어져", "텔레비전", "시끄러운", "축구", "경기", "방송되고", "방", "구석", "로봇청소기", "윙윙거리며", "돌아다니고", "평화롭고", "재미있는", "풍경", "부드러운", "유화"]
   },
   {
     stage: 5,
     title: "스테이지 5: 우주를 나는 햄버거",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage5.png",
+    prompt: "조용한 우주공간에서 커다란 햄버거 모양의 우주선이 별들 사이를 빠르게 날아가고 있다. 우주선 창문으로는 초록색 외계인이 활짝 웃으며 손을 흔들고 있고, 뒤쪽으로는 뜨거운 불꽃이 강력하게 뿜어져 나온다. 아래에는 푸른색 지구가 아름답게 빛나며 돌아가고 있는 유쾌한 픽셀 아트 스타일이다.",
     keywords: ["조용한", "우주공간", "커다란", "햄버거", "우주선", "별들", "빠르게", "날아가고", "창문", "초록색", "외계인", "활짝", "웃으며", "손", "흔들고", "뒤쪽", "뜨거운", "불꽃", "강력하게", "뿜어져", "아래", "푸른색", "지구", "아름답게", "빛나며", "돌아가고", "유쾌한", "픽셀", "아트", "스타일"]
   },
   {
     stage: 6,
     title: "스테이지 6: 하늘을 나는 종이비행기 버스",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage6.png",
+    prompt: "노란색 학교 버스가 복잡한 도시의 하늘을 자유롭게 날아가고 있다. 버스의 열린 창문 밖으로 신난 학생들이 종이비행기를 힘껏 던지고 있고, 운전석에는 친절한 곰이 핸들을 단단히 잡고 크게 웃고 있다. 붉은 노을이 아름답게 물드는 따뜻한 클레이 아트 그림이다.",
     keywords: ["노란색", "학교", "버스", "복잡한", "도시", "하늘", "자유롭게", "날아가고", "열린", "창문", "신난", "학생들", "종이비행기", "힘껏", "던지고", "운전석", "친절한", "곰", "핸들", "단단히", "잡고", "크게", "웃고", "붉은", "노을", "아름답게", "물드는", "따뜻한", "클레이", "아트"]
   },
   {
     stage: 7,
     title: "스테이지 7: 털복숭이 괴물의 생일파티",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage7.png",
+    prompt: "어두운 동굴 안에서 초록색 털복숭이 괴물이 즐겁게 생일 파티를 열고 있다. 둥근 탁자 위에는 달콤한 딸기 케이크가 놓여있고, 괴물은 뾰족한 고깔모자를 쓰고 다섯 개의 촛불을 세게 불어서 끄고 있다. 벽에는 화려한 풍선들이 가득하게 매달려 있는 귀여운 수채화 화풍이다.",
     keywords: ["어두운", "동굴", "초록색", "털복숭이", "괴물", "즐겁게", "생일", "파티", "열고", "둥근", "탁자", "달콤한", "딸기", "케이크", "놓여있고", "뾰족한", "고깔모자", "쓰고", "다섯", "촛불", "세게", "불어서", "끄고", "벽", "화려한", "풍선들", "가득하게", "매달려", "귀여운", "수채화"]
   },
   {
     stage: 8,
     title: "스테이지 8: 나무늘보의 아찔한 롤러코스터",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage8.png",
+    prompt: "푸른 숲속 거대한 놀이공원에서 느린 나무늘보가 빨간색 롤러코스터를 타고 빠르게 내려가고 있다. 나무늘보의 두 눈은 무서워서 동그랗게 커져있고, 바람 때문에 긴 털이 뒤로 심하게 날리고 있다. 옆자리에는 신난 토끼가 양 손을 위로 번쩍 들고 있는 코믹한 웹툰 그림이다.",
     keywords: ["푸른", "숲속", "거대한", "놀이공원", "느린", "나무늘보", "빨간색", "롤러코스터", "타고", "빠르게", "내려가고", "두", "눈", "무서워서", "동그랗게", "커져있고", "바람", "긴", "털", "뒤로", "심하게", "날리고", "옆", "신난", "토끼", "양", "손", "위로", "번쩍", "들고"]
   },
   {
     stage: 9,
     title: "스테이지 9: 슬픈 티라노사우루스의 독서",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage9.png",
+    prompt: "조용한 도서관 안에서 커다란 공룡이 작은 동화책을 읽으려고 애쓰고 있다. 공룡의 짧은 앞발은 책에 닿지 않아서 슬프게 우는 표정을 짓고 있고, 주변에는 두꺼운 사전들이 산더미처럼 높게 쌓여있다. 창문으로 노란색 햇빛이 부드럽게 들어오는 실제 사진 느낌이다.",
     keywords: ["조용한", "도서관", "커다란", "공룡", "작은", "동화책", "읽으려고", "애쓰고", "짧은", "앞발", "책", "닿지", "않아서", "슬프게", "우는", "표정", "짓고", "주변", "두꺼운", "사전들", "산더미처럼", "높게", "쌓여있다", "창문", "노란색", "햇빛", "부드럽게", "들어오는", "실제", "사진"]
   },
   {
     stage: 10,
     title: "스테이지 10: 바다 청소부 잠수함",
     image: "https://raw.githubusercontent.com/username/repo/main/images/stage10.png",
+    prompt: "깊고 차가운 바닷속에서 노란색 잠수함이 기계 팔을 뻗어서 더러운 쓰레기를 열심히 줍고 있다. 잠수함 앞에는 밝은 조명이 환하게 켜져있고, 근처에는 호기심 많은 바다거북이 천천히 다가와서 구경하고 있다. 신비로운 파란색 물방울들이 보글보글 올라가는 일러스트 그림이다.",
     keywords: ["깊고", "차가운", "바닷속", "노란색", "잠수함", "기계", "팔", "뻗어서", "더러운", "쓰레기", "열심히", "줍고", "앞", "밝은", "조명", "환하게", "켜져있고", "근처", "호기심", "많은", "바다거북", "천천히", "다가와서", "구경하고", "신비로운", "파란색", "물방울들", "보글보글", "올라가는", "일러스트"]
   }
 ];
@@ -842,6 +1017,14 @@ function loadStage(idx) {
     img.src = stage.image;
   }, 50);
 
+  // reset result banner
+  document.getElementById('result-banner').classList.remove('show');
+  document.getElementById('answer-prompt-text').innerHTML = '';
+
+  // next stage button label
+  const isLast = idx === gameData.length - 1;
+  document.getElementById('btn-next-stage').textContent = isLast ? '🏁 결과 보기' : '다음 문제로 ➜';
+
   // keywords chips
   buildKeywordChips(stage.keywords);
 
@@ -874,76 +1057,165 @@ function updateCounts() {
 }
 
 // ============================================================
-// SUBMIT KEYWORD
+// SUBMIT PROMPT (bulk grading)
 // ============================================================
-function submitKeyword() {
+function submitPrompt() {
   const input = document.getElementById('keyword-input');
-  const val = input.value.trim();
-  if (!val) return;
+  const text = input.value.trim();
+  if (!text) {
+    input.classList.add('wrong-flash');
+    setTimeout(() => input.classList.remove('wrong-flash'), 300);
+    showNpc('아무것도 안 쓰면 어떡해요!! 뭐라도 써봐요 😤');
+    return;
+  }
 
   const stage = gameData[currentStageIdx];
-  const match = stage.keywords.find(kw => kw === val && !foundKeywords.has(kw));
+  const newlyFound = [];
+  const alreadyFound = [];
 
-  if (match) {
-    handleCorrect(match, input);
+  stage.keywords.forEach(kw => {
+    if (text.includes(kw)) {
+      if (!foundKeywords.has(kw)) {
+        newlyFound.push(kw);
+        foundKeywords.add(kw);
+      } else {
+        alreadyFound.push(kw);
+      }
+    }
+  });
+
+  const missed = stage.keywords.filter(kw => !foundKeywords.has(kw));
+
+  // flash
+  if (newlyFound.length > 0) {
+    input.classList.add('grading-flash');
+    setTimeout(() => input.classList.remove('grading-flash'), 500);
   } else {
-    handleWrong(input, stage.keywords.includes(val));
+    input.classList.add('wrong-flash');
+    setTimeout(() => input.classList.remove('wrong-flash'), 300);
   }
+
+  // reveal chips & particles
+  newlyFound.forEach((kw, i) => {
+    setTimeout(() => {
+      const chip = document.getElementById(`chip-${kw}`);
+      if (chip) {
+        chip.textContent = kw;
+        chip.classList.add('found');
+        spawnParticlesAt(chip);
+      }
+      if (currentStageIdx > 0) {
+        totalScore++;
+        document.getElementById('score-num').textContent = totalScore;
+      }
+    }, i * 80);
+  });
+
+  // show result banner
+  showResultBanner(newlyFound, alreadyFound, missed, text);
+
+  // update counts
+  setTimeout(() => {
+    updateCounts();
+    triggerNpcForGrade(newlyFound, missed, stage.keywords.length);
+
+    if (foundKeywords.size === stage.keywords.length) {
+      setTimeout(stageClear, 700);
+    }
+  }, newlyFound.length * 80 + 100);
 }
 
-function handleCorrect(keyword, input) {
-  foundKeywords.add(keyword);
-  input.value = '';
-  input.classList.add('correct-flash');
-  setTimeout(() => input.classList.remove('correct-flash'), 400);
+function showResultBanner(newlyFound, alreadyFound, missed, inputText) {
+  const banner = document.getElementById('result-banner');
+  const titleEl = document.getElementById('result-banner-title');
+  const listEl = document.getElementById('result-found-list');
+  const missEl = document.getElementById('result-miss');
 
-  // reveal chip
-  const chip = document.getElementById(`chip-${keyword}`);
-  if (chip) {
-    chip.textContent = keyword;
-    chip.classList.add('found');
+  banner.classList.add('show');
+  listEl.innerHTML = '';
+
+  if (newlyFound.length > 0) {
+    titleEl.textContent = `🎯 이번에 ${newlyFound.length}개 발견! 총 ${foundKeywords.size}개 맞힘`;
+    newlyFound.forEach(kw => {
+      const tag = document.createElement('span');
+      tag.className = 'result-tag';
+      tag.textContent = `✅ ${kw}`;
+      listEl.appendChild(tag);
+    });
+  } else {
+    titleEl.textContent = `🤔 이번엔 새로운 키워드가 없어요. 다르게 써볼까요?`;
   }
 
-  // particles at input
-  spawnParticles(input);
-  // popup text
-  showCorrectPopup(keyword, input);
-
-  // score (not for stage 0)
-  if (currentStageIdx > 0) {
-    totalScore++;
-    document.getElementById('score-num').textContent = totalScore;
+  if (missed.length > 0) {
+    missEl.textContent = `아직 ${missed.length}개 남았어요. 프롬프트를 더 자세히 써봐요!`;
+  } else {
+    missEl.textContent = '';
   }
 
-  updateCounts();
+  // Render highlighted answer prompt
+  renderAnswerPrompt();
+}
 
-  // NPC messages
-  const pct = foundKeywords.size / gameData[currentStageIdx].keywords.length;
-  if (foundKeywords.size === 1) {
-    showNpc(getNpcMsg('firstCorrect'));
-  } else if (Math.abs(pct - 0.5) < 0.05 && foundKeywords.size > 1) {
-    showNpc(getNpcMsg('halfway'));
-  } else if (pct >= 0.85 && pct < 1) {
+function renderAnswerPrompt() {
+  const stage = gameData[currentStageIdx];
+  const promptText = stage.prompt || '';
+  const keywords = stage.keywords;
+  const promptEl = document.getElementById('answer-prompt-text');
+
+  // Build highlighted HTML: scan through prompt and wrap keywords
+  // Sort keywords by length descending to match longer ones first
+  const sorted = [...keywords].sort((a, b) => b.length - a.length);
+  let html = promptText;
+
+  // Use placeholder tokens to avoid double-replacing
+  const tokens = {};
+  sorted.forEach((kw, i) => {
+    const token = `__KW${i}__`;
+    const cls = foundKeywords.has(kw) ? 'kw-hit' : 'kw-miss';
+    tokens[token] = `<span class="${cls}">${kw}</span>`;
+    // Replace all occurrences
+    html = html.split(kw).join(token);
+  });
+  // Now replace tokens with actual spans
+  Object.entries(tokens).forEach(([token, span]) => {
+    html = html.split(token).join(span);
+  });
+
+  promptEl.innerHTML = html;
+}
+
+function goNextStage() {
+  const isLast = currentStageIdx === gameData.length - 1;
+  if (isLast) {
+    endGame();
+    return;
+  }
+  currentStageIdx++;
+  loadStage(currentStageIdx);
+}
+
+function triggerNpcForGrade(newlyFound, missed, total) {
+  const foundTotal = foundKeywords.size;
+  const pct = foundTotal / total;
+
+  if (newlyFound.length === 0) {
+    showNpc(getNpcMsg('encouragement'));
+  } else if (pct === 1) {
+    showNpc(getNpcMsg('stageClear'));
+  } else if (pct >= 0.8) {
     showNpc(getNpcMsg('almostDone'));
-  } else if (foundKeywords.size % 5 === 0 && foundKeywords.size > 0 && pct < 1) {
+  } else if (pct >= 0.5) {
+    showNpc(getNpcMsg('halfway'));
+  } else if (newlyFound.length >= 5) {
+    showNpc(`한 번에 ${newlyFound.length}개나 맞혔어?? 실화냐 ㄹㅇ 🤯`);
+  } else {
     showNpc(getNpcMsg('correct'));
   }
-
-  // check stage clear
-  if (foundKeywords.size === gameData[currentStageIdx].keywords.length) {
-    setTimeout(stageClear, 600);
-  }
 }
 
-function handleWrong(input, alreadyFound) {
+function handleWrong(input) {
   input.classList.add('wrong-flash');
   setTimeout(() => input.classList.remove('wrong-flash'), 300);
-  input.select();
-
-  // occasional encouragement
-  if (Math.random() < 0.25) {
-    showNpc(getNpcMsg('encouragement'));
-  }
 }
 
 // ============================================================
@@ -1018,25 +1290,25 @@ function closeNpc() {
 // ============================================================
 // PARTICLES
 // ============================================================
-function spawnParticles(anchorEl) {
+function spawnParticlesAt(anchorEl) {
   const rect = anchorEl.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
-  const cy = rect.top;
+  const cy = rect.top + rect.height / 2;
   const colors = ['#00ff88', '#00f5ff', '#ffee00', '#ff00aa', '#aa00ff'];
   
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 10; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    const size = 5 + Math.random() * 7;
+    const size = 4 + Math.random() * 6;
     const angle = (Math.random() * 2 * Math.PI);
-    const dist = 40 + Math.random() * 60;
+    const dist = 30 + Math.random() * 50;
     const tx = Math.cos(angle) * dist;
-    const ty = -(30 + Math.random() * 80);
-    const dur = 0.5 + Math.random() * 0.5;
+    const ty = -(20 + Math.random() * 60);
+    const dur = 0.4 + Math.random() * 0.5;
     p.style.cssText = `
       width:${size}px; height:${size}px;
       background:${colors[Math.floor(Math.random()*colors.length)]};
-      left:${cx + (Math.random()-0.5)*30}px; top:${cy}px;
+      left:${cx}px; top:${cy}px;
       --tx:${tx}px; --ty:${ty}px; --dur:${dur}s;
       box-shadow: 0 0 6px currentColor;
     `;
@@ -1090,21 +1362,14 @@ function launchConfetti() {
 }
 
 // ============================================================
-// KEYBOARD SUPPORT
+// KEYBOARD SUPPORT — Ctrl+Enter or Shift+Enter to submit
 // ============================================================
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    const activeScreen = document.querySelector('.screen.active');
-    if (activeScreen && activeScreen.id === 'game-screen') {
-      submitKeyword();
-    }
-  }
-});
-
-// Auto-focus input when clicking anywhere on game screen
-document.getElementById('game-screen').addEventListener('click', (e) => {
-  if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-    document.getElementById('keyword-input').focus();
+  const activeScreen = document.querySelector('.screen.active');
+  if (!activeScreen || activeScreen.id !== 'game-screen') return;
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    submitPrompt();
   }
 });
 </script>
