@@ -1170,7 +1170,7 @@ function showResultBanner(newlyFound, alreadyFound, missed, inputText) {
   listEl.innerHTML = '';
 
   if (newlyFound.length > 0) {
-    titleEl.textContent = `🎯 이번에 ${newlyFound.length}개 발견! 총 ${foundKeywords.size}개 맞힘`;
+    titleEl.textContent = `🎯 이번에는 키워드 ${newlyFound.length}개 발견!`;
     newlyFound.forEach(kw => {
       const tag = document.createElement('span');
       tag.className = 'result-tag';
