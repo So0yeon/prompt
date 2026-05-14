@@ -702,6 +702,11 @@
     margin: 16px 0;
     text-align: center;
   }
+button:disabled{
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+  
 </style>
 </head>
 <body>
@@ -1023,6 +1028,7 @@ function updateProgress() {
 // LOAD STAGE
 // ============================================================
 function loadStage(idx) {
+  hasSubmittedOnce = false;
   const stage = gameData[idx];
   foundKeywords = new Set();
 
@@ -1095,6 +1101,8 @@ function updateCounts() {
 // SUBMIT PROMPT (bulk grading)
 // ============================================================
 function submitPrompt() {
+  hasSubmittedOnce = true;
+  toggleButtons();
   const input = document.getElementById('keyword-input');
   const text = input.value.trim();
   if (!text) {
@@ -1462,6 +1470,24 @@ function finalSubmit() {
   
   showNpc('💯 최종 채점 완료!');
 }
+  const keywordInput = document.getElementById('keyword-input');
+  const submitBtn = document.getElementById('btn-submit');
+  const finalBtn = document.getElementById('btn-final');
+
+  let hasSubmittedOnce = false;
+
+  function toggleButtons() {
+
+    const hasText = keywordInput.value.trim() !== '';
+
+  // 중간점검 버튼
+    submitBtn.disabled = !hasText;
+
+  // 최종제출 버튼
+    finalBtn.disabled = !(hasText || hasSubmittedOnce);
+}
+
+keywordInput.addEventListener('input', toggleButtons);
 </script>
 </body>
 </html>
